@@ -56,7 +56,7 @@ class Api::TagsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def tag_params
-      params.require(:tag).permit(:nome)
+      params.require(:tag).permit(:nome, :pesquisada)
     end
 
     def salvarFrase
