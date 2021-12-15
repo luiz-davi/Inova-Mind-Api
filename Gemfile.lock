@@ -163,6 +163,7 @@ DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
   devise
+  nokogiri
   puma (~> 5.0)
   rack-attack
   rack-cors

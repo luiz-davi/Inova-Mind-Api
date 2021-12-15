@@ -1,4 +1,8 @@
+require 'nokogiri' 
+require 'open-uri'
+
 class Api::TagsController < ApplicationController
+  TAG = 'simile'
   before_action :set_tag, only: [:show, :update, :destroy]
 
   # GET /tags
@@ -6,6 +10,12 @@ class Api::TagsController < ApplicationController
     @tags = Tag.all
 
     render json: @tags
+  end
+  
+  def buscarFrase
+    if Tag.find_by(nome: TAG).nil?
+      Tag.new(nome: TAG).save
+    end
   end
 
   # GET /tags/1
@@ -47,5 +57,11 @@ class Api::TagsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def tag_params
       params.require(:tag).permit(:nome)
+    end
+
+    def salvarFrase
+    end
+
+    def salvarTag
     end
 end
