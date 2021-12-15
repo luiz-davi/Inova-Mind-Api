@@ -14,7 +14,14 @@ class Api::TagsController < ApplicationController
   
   def buscarFrase
     if Tag.find_by(nome: TAG).nil?
-      Tag.new(nome: TAG).save
+      tag = Tag.new(nome: TAG, pesquisada: true)
+      tag.save
+      salvarFrase(tag)
+      # crowlear página
+    elsif Tag.find_by(nome: TAG).pesquisada
+      # retornar informações do banco
+    elsif !Tag.find_by(nome: TAG).pesquisada
+      # corwlear página
     end
   end
 
@@ -59,7 +66,44 @@ class Api::TagsController < ApplicationController
       params.require(:tag).permit(:nome, :pesquisada)
     end
 
-    def salvarFrase
+    def salvarFrase(tagMaster)
+      frases = []
+      # declarando URLs necessárias
+      url = 'http://quotes.toscrape.com/tag'
+      urlAuthor = "http://quotes.toscrape.com"
+      
+      # Abrindo a url e capturando o código fonte
+      response = "#{url}/#{tagMaster.nome}/"
+      html = URI.open(response)
+      doc = Nokogiri::HTML(html)
+      dados = doc.css('div.row').css('div.col-md-8')
+
+      # extraindo dados do html
+      dados.search('div.quote').each do |frase|
+        quote = frase.css('span.text').text
+        author = frase.css('span').css('small').text
+        author_about = urlAuthor + frase.css('span').css('a').attribute('href').value
+
+        # criando frase com as informações do site
+        fraseMaster = Frase.new quote: quote, author: author, author_about: author_about
+        fraseMaster.tags << tagMaster
+
+        # capturando tags e salvando elas no banco
+        frase.search('div.tags').css('a.tag').each do |tag|
+            # Salvando as tags secundárias
+            if tag.text != tagMaster.nome
+              if Tag.find_by(nome: tag.text)
+              tagBeta = Tag.new nome: tag.text, pesquisa: false
+              tagBeta.save
+              fraseMaster.tags << tagBeta
+            end
+        end
+        
+        fraseMaster.save
+        frases << fraseMaster
+
+        next if frase['class'] == 'pager'
+      end
     end
 
     def salvarTag
