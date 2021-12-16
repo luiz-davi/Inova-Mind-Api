@@ -2,7 +2,6 @@ require 'nokogiri'
 require 'open-uri'
 
 class Api::TagsController < ApplicationController
-  TAG = 'change'
   before_action :set_tag, only: [:show, :update, :destroy]
 
   # GET /tags
@@ -12,26 +11,38 @@ class Api::TagsController < ApplicationController
     render json: @tags
   end
   
-  def buscarFrase
-    if Tag.find_by(nome: TAG).nil?
-      tag = Tag.new(nome: TAG, pesquisada: true)
-      tag.save
-      frases = salvarFrase(tag)
+  def buscar_frase_tag
+    if Tag.find_by(nome: params[:tag]).nil?
+      tag = Tag.create(nome: params[:tag], pesquisada: true)
+
+      salvarFrase(tag)
 
       render json: tag.frases
     # crowlear página
     else 
-      if Tag.find_by(nome: TAG).pesquisada
-        render json: Tag.find_by(nome: TAG).frases
+      if Tag.find_by(nome: params[:tag]).pesquisada
+        render json: Tag.find_by(nome: params[:tag]).frases
       else
-        tag = Tag.find_by(nome: TAG)
+        tag = Tag.find_by(nome: params[:tag])
         tag.update(pesquisada: true)
 
-        @frases = salvarFrase(tag)
+        salvarFrases(tag)
 
-        render json: @frases
+        render json: tag.frases
       end
     end
+  end
+
+  def frases
+    @frases = Frase.all
+
+    render json: @frases
+  end
+
+  def buscar_frase_author
+    @frases = Frase.where(author: params[:author])
+
+    render json: @frases
   end
 
   # GET /tags/1
@@ -77,7 +88,6 @@ class Api::TagsController < ApplicationController
 
     def salvarFrase(tagMaster)
       urlAuthor = "http://quotes.toscrape.com"
-      frases = []
       
       dados = abrirSite(tagMaster.nome)
 
@@ -87,6 +97,11 @@ class Api::TagsController < ApplicationController
         author = frase.css('span').css('small').text
         author_about = urlAuthor + frase.css('span').css('a').attribute('href').value
 
+        # caso a frase já exista no banco, ela não será salva novamente
+        unless Frase.find_by(quote: quote).nil?
+          next
+        end
+
         # criando frase com as informações do site
         fraseMaster = Frase.create quote: quote, author: author, author_about: author_about
         fraseMaster.tags << tagMaster
@@ -95,7 +110,6 @@ class Api::TagsController < ApplicationController
         frase.search('div.tags').css('a.tag').each do |tag|
           # Salvando as tags secundárias
           if tag.text != tagMaster.nome
-            
             # Se a tag não estiver no banco, então ela será salva
             if Tag.find_by(nome: tag.text).nil?
               tagBeta = Tag.new nome: tag.text, pesquisada: false
@@ -108,16 +122,11 @@ class Api::TagsController < ApplicationController
           end
         end
         
-        # salva a frase e adiciona no array de impressão
-        frases << fraseMaster
-
         # fim da busca por informações
         next if frase['class'] == 'pager'
       end
 
-      return frases
     end
-
 
     def abrirSite(tag)
       
@@ -132,8 +141,5 @@ class Api::TagsController < ApplicationController
       # retornando html que contém apenas as frases
       return dados = doc.css('div.row').css('div.col-md-8')
     
-    end
-
-    def salvarTag
     end
 end
