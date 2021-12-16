@@ -2,7 +2,7 @@
 > Status: **Finalizado**✅<br>
 
 ## Sobre o projeto 📑
-Projeto proposto pela [Inova Mind](https://inovamind.com.br) com o objetivo de testar minhas habilidades. O projeto é uma Api que faz um web Crawler de um [Quotes to Scrape](http://quotes.toscrape.com) e retorna as informações da frase.
+Projeto proposto pela [Inova Mind](https://inovamind.com.br) com o objetivo de testar minhas habilidades. O projeto é uma Api que faz um web Crawler da página [Quotes to Scrape](http://quotes.toscrape.com)(site esse que disponibiliza frases) e extrai as informações necessárias e retorna em formato json. 
 
 ## Objetivo ✅
 O objetivo principal da Api é buscar e armazenar em cache as frases. Retorna as informações de cada frase em formato Json. Ele tanto retorna as informações diretamente do site, como também armazena em cache caso a busca já tenha sido feita anteriormente. Essas buscas são feitas através de parâmetros indicados na URL. Atualmente existem 2 buscas(endpoints) na api: buscar pela *tag* e pelo *author*
@@ -18,7 +18,7 @@ O objetivo principal da Api é buscar e armazenar em cache as frases. Retorna as
 
 + Para obter as informações das frases, foi feito o web crawler da página [Quotes to Scrape](http://quotes.toscrape.com), utilizando a gem [Nokogiri](https://rubygems.org/gems/nokogiri/versions/1.6.8?locale=pt-BR).
 
-+ O armazanamento em cache se comporta de duas forma: se a tag *não foi* pesquida ainda, ela é salva no banco com o atributo 'pesquisada' marcado como verdadeiro
++ O armazenamento em cache se comporta de duas formas: se a tag *não foi* pesquida ainda, ela é salva no banco com o atributo 'pesquisada' marcado como verdadeiro
 , isso faz com que não seja mais preciso voltar no site e 'minerar' as informações.
 
 + Como cada frase pode ter várias tags, as tags secundárias são salvas, mas marcadas como 'não' pesquisadas, ou seja, todas as frases dessa tag não estão em cache, apenas as frases em comum com a tag que está sendo de fato pesquisada. Quando uma tag que foi salva como secundária é pesquisada, é feito mais uma pesquisa na página, dessa vez pesquisando apenas as frases que faltam. E logicamente essa tag agora muda o status pra pesquisada igual a verdadeiro.
