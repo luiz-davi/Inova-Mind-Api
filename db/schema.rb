@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_15_144605) do
+ActiveRecord::Schema.define(version: 2021_12_16_004724) do
 
   create_table "frases", force: :cascade do |t|
     t.string "quote"
@@ -18,6 +18,15 @@ ActiveRecord::Schema.define(version: 2021_12_15_144605) do
     t.string "author_about"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "tagfrases", force: :cascade do |t|
+    t.integer "tag_id", null: false
+    t.integer "frase_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["frase_id"], name: "index_tagfrases_on_frase_id"
+    t.index ["tag_id"], name: "index_tagfrases_on_tag_id"
   end
 
   create_table "tags", force: :cascade do |t|
@@ -41,4 +50,6 @@ ActiveRecord::Schema.define(version: 2021_12_15_144605) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "tagfrases", "frases"
+  add_foreign_key "tagfrases", "tags"
 end

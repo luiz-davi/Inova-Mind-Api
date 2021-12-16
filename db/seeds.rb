@@ -5,3 +5,5 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+Tag.create nome: 'similar'
+Frase.create quote: 'rosas são vermelhas...', author: 'Davi', author_about: './davi'
