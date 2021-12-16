@@ -1,7 +1,7 @@
 require 'nokogiri' 
 require 'open-uri'
 
-class Api::TagsController < ApplicationController
+class TagsController < ApplicationController
   before_action :set_tag, only: [:show, :update, :destroy]
 
   # GET /tags
@@ -11,7 +11,8 @@ class Api::TagsController < ApplicationController
     render json: @tags
   end
   
-  def buscar_frase_tag
+  # Buscar
+  def quotes
     if Tag.find_by(nome: params[:tag]).nil?
       tag = Tag.create(nome: params[:tag], pesquisada: true)
 
@@ -26,7 +27,7 @@ class Api::TagsController < ApplicationController
         tag = Tag.find_by(nome: params[:tag])
         tag.update(pesquisada: true)
 
-        salvarFrases(tag)
+        salvarFrase(tag)
 
         render json: tag.frases
       end
