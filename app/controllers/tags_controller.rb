@@ -2,7 +2,7 @@ require 'nokogiri'
 require 'open-uri'
 
 class Api::TagsController < ApplicationController
-  TAG = 'simile'
+  TAG = 'change'
   before_action :set_tag, only: [:show, :update, :destroy]
 
   # GET /tags
@@ -16,14 +16,21 @@ class Api::TagsController < ApplicationController
     if Tag.find_by(nome: TAG).nil?
       tag = Tag.new(nome: TAG, pesquisada: true)
       tag.save
-      @frases = salvarFrase(tag)
+      frases = salvarFrase(tag)
 
-      render json: @frases
-    #   # crowlear página
-    # elsif Tag.find_by(nome: TAG).pesquisada
-    #   # retornar informações do banco
-    # elsif !Tag.find_by(nome: TAG).pesquisada
-    #   # corwlear página
+      render json: tag.frases
+    # crowlear página
+    else 
+      if Tag.find_by(nome: TAG).pesquisada
+        render json: Tag.find_by(nome: TAG).frases
+      else
+        tag = Tag.find_by(nome: TAG)
+        tag.update(pesquisada: true)
+
+        @frases = salvarFrase(tag)
+
+        render json: @frases
+      end
     end
   end
 
@@ -82,7 +89,6 @@ class Api::TagsController < ApplicationController
 
         # criando frase com as informações do site
         fraseMaster = Frase.create quote: quote, author: author, author_about: author_about
-        # puts fraseMaster.tags
         fraseMaster.tags << tagMaster
 
         # capturando tags e salvando elas no banco
